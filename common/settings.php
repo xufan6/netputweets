@@ -109,6 +109,7 @@ function settings_page($args) {
 		'zh_CN' => '简体中文',
 		'en_US' => 'English',
 		'zh_TW' => '繁體中文',
+		'wtf'	=> 'wtf',
 	);
 
 	$linktrans = array(

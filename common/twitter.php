@@ -774,6 +774,9 @@ function twitter_user_page($query) {
 		$str = __("User");
 		$content .= theme('timeline', $tl);
 	}
+	elseif (($query[2] !== 'reply') || (($query[2] == 'reply') && (setting_fetch('moreinreply') == 'yes'))) {
+		$content .= theme('timeline', $tl);
+	}
 	theme('page', "$str $screen_name", $content);
 }
 

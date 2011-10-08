@@ -78,6 +78,7 @@ function settings_page($args) {
 		$settings['linktrans'] = $_POST['linktrans'];
 		$settings['avataro'] = $_POST['avataro'];
 		$settings['buttonintext'] = $_POST['buttonintext'];
+		$settings['moreinreply'] = $_POST['moreinreply'];
 
 		$settings['buttontime'] = $_POST['buttontime'];
 		$settings['buttonfrom'] = $_POST['buttonfrom'];
@@ -155,6 +156,7 @@ function settings_page($args) {
 	$content .= '<label>　<input type="checkbox" name="buttonend" value="yes" '. (setting_fetch('buttonend') == 'yes' ? ' checked="checked" ' : '') .' /> '.__("Put the Buttons after each Status").'</label><br />';
 	$content .= '<label>　<input type="checkbox" name="buttontime" value="yes" '. (setting_fetch('buttontime', 'yes') == 'yes' ? ' checked="checked" ' : '') .' /> '.__("Show Status Time").'</label><br />';
 	$content .= '<label>　<input type="checkbox" name="buttonfrom" value="yes" '. (setting_fetch('buttonfrom', 'yes') == 'yes' ? ' checked="checked" ' : '') .' /> '.__("Show Status Source").'</label><br />';
+	$content .= '<label>　<input type="checkbox" name="moreinreply" value="yes" '. (setting_fetch('moreinreply', 'yes') == 'yes' ? ' checked="checked" ' : '') .' /> '.__("Show Status in Reply Page").'</label><br />';
 	$content .= '<label>　<input type="checkbox" name="avataro" value="yes" '. (setting_fetch('avataro', 'yes') == 'yes' ? ' checked="checked" ' : '') .' /> '.__("Show Avatar").'</label><br />';
 	$content .= '<label>　<input type="checkbox" name="fixedtago" value="yes" '. (setting_fetch('fixedtago', 'no') == 'yes' ? ' checked="checked" ' : '') .' /> '.__("Enable Fixed Tag: ").'</label>#<input type="text" id="fixedtagc" name="fixedtagc" value="'.setting_fetch('fixedtagc').'" maxlength="70" style="width:40px;" /><br />';
 	if (function_exists('mb_strlen')) $content .= '<label>　'.__("When posting a 140+ chars tweet: ").'<select name="longtext">'.theme('options', $longtext, setting_fetch('longtext', 'r')).'</select></label><hr />';

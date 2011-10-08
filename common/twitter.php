@@ -1201,7 +1201,7 @@ function theme_timeline($feed) {
 		if (setting_fetch('buttonend') == 'yes') {
 			$html .= "<span class='stext'>{$text}</span><br /><small class='sbutton'>$actions $link ";
 		} else {
-			$html .= "<small class='sbutton'>$actions</small><br /><span class='stext'>{$text}</span><br /><small class='sbutton'>$link";
+			$html .= "<small class='sbutton'>$actions $link</small><br /><span class='stext'>{$text}</span><small class='sbutton'>";
 		}
 
 		$html .= " $source $replyto</small>";

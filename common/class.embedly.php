@@ -54,7 +54,7 @@ function embedly_embed_thumbnails(&$feed) {
 			if ($status->entities->media) {
 				$image = $status->entities->media[0]->media_url;
 
-				$media_html = "<a href=\"".$image."\"><img src=\"".img_proxy_url($image)."\" width=\"{$status->entities->media[0]->sizes->thumb->w}\" height=\"{$status->entities->media[0]->sizes->thumb->h}\" /></a>";
+				$media_html = "<a href=\"".$image."\"><img src=\"".img_proxy_url($image).":thumb"."\" width=\"{$status->entities->media[0]->sizes->thumb->w}\" height=\"{$status->entities->media[0]->sizes->thumb->h}\" /></a>";
 
 				$feed[$status->id]->text .= "<br />$media_html";
 			}

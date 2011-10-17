@@ -397,25 +397,27 @@ function twitter_parse_tags($input, $entities = false) {
                 $out = preg_replace($pattern,  $link_html, $out, 1);
             }
         }
-	} else {  // If Entities haven't been returned, use Autolink
-		// Create an array containing all URLs
-		$urls = Twitter_Extractor::create($input)->extractURLs();
+    } else {  // If Entities haven't been returned, use Autolink
+        // Create an array containing all URLs
+        $urls = Twitter_Extractor::create($input)
+            ->extractURLs();
 
-		// Hyperlink the URLs
-		$out = Twitter_Autolink::create($out)->addLinksToURLs();
+        $out = Twitter_Autolink::create($out)
+            ->addLinksToURLs();
 
-		// Hyperlink the #
-		$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToHashtags();
-	}
+        // Hyperlink the #
+        $out = Twitter_Autolink::create($out)
+            ->setTarget('')
+            ->addLinksToHashtags();
+    }
 
-	// Hyperlink the @ and lists
-	$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToUsernamesAndLists();
+    // Hyperlink the @ and lists
+    $out = Twitter_Autolink::create($out)
+        ->setTarget('')
+        ->addLinksToUsernamesAndLists();
 
-	// Hyperlink the #
-	$out = Twitter_Autolink::create($out)->setTarget('')->addLinksToHashtags();
-
-	//Return the completed string
-	return $out;
+    //Return the completed string
+    return $out;
 }
 
 function format_interval($timestamp, $granularity = 1) {

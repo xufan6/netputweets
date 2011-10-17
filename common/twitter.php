@@ -318,24 +318,33 @@ function twitter_process($url, $post_data = false) {
 	curl_close($ch);
 
 	switch (intval( $response_info['http_code'])) {
-	case 200:
-	case 201:
-		$json = json_decode($response);
-		if ($json) return $json;
-		return $response;
-	case 401:
-		user_logout();
-		theme('error', "<p>".__("Error: Login credentials incorrect.")."</p><p>{$response_info['http_code']}: {$result}</p><hr><p>$url</p>");
-	case 0:
-		$result = $erno . ":" . $er . "<br />" ;
-		theme("error", "<h3>".__("Twitter timed out")."</h3><p>".__("Dabr gave up on waiting for Twitter to respond. They're probably overloaded right now, try again in a minute.")."<br />$result</p>");
-	default:
-		$result = json_decode($response);
-		$result = $result->error ? $result->error : $response;
-		if (strlen($result) > 500) {
-			$result = __("Something broke on Twitter's end.");
-		}
-		theme('error', "<h3>".__("An error occured while calling the Twitter API")."</h3><p>{$response_info['http_code']}: {$result}</p><hr /><p>$url</p>");
+		case 200:
+		case 201:
+			$json = json_decode($response);
+
+			if ($json) return $json;
+
+			return $response;
+
+		case 401:
+			user_logout();
+
+			theme('error', "<p>".__("Error: Login credentials incorrect.")."</p><p>{$response_info['http_code']}: {$result}</p><hr><p>$url</p>");
+
+		case 0:
+			$result = $erno . ":" . $er . "<br />" ;
+
+			theme("error", "<h3>".__("Twitter timed out")."</h3><p>".__("Dabr gave up on waiting for Twitter to respond. They're probably overloaded right now, try again in a minute.")."<br />$result</p>");
+
+		default:
+			$origin_result = json_decode($response);
+			$result = $origin_result->error ? $origin_result->error : $response;
+
+			if (strlen($result) > 500) {
+				$result = __("Something broke on Twitter's end.");
+			}
+
+			theme('error', "<h3>".__("An error occured while calling the Twitter API")."</h3><p>{$response_info['http_code']}: {$result}</p><hr /><p>$url</p>");
 	}
 }
 
@@ -419,27 +428,45 @@ function format_interval($timestamp, $granularity = 1) {
 
 function twitter_status_page($query) {
 	$id = (string) $query[1];
+
 	if (is_numeric($id)) {
+		$thread = array();
+
 		$request = API_URL."statuses/show/{$id}.json?include_entities=true";
 		$status = twitter_process($request);
+
 		$content = theme('status', $status);
 
-		if (!$status->user->protected) {
-			$thread = twitter_thread_timeline($id);
+		for ($i=0;$i<3;$i++) {
+			$reply_id = $status->in_reply_to_status_id_str;
+			$reply_user = $status->in_reply_to_screen_name;
+
+			if (!$reply_id) break;
+
+			if (strtolower($reply_user) != strtolower(user_current_username())) {
+				$request = API_URL."users/show/{$reply_user}.json?include_entities=true";
+				$result = twitter_process($request);
+
+				if ($result->protected && !$result->following) break;
+			}
+
+			$request = API_URL."statuses/show/{$reply_id}.json?include_entities=true";
+			$status = twitter_process($request);
+
+			$thread[] = $status;
 		}
 
-		if ($thread) {
-			$content .= theme('timeline', $thread);
+		if (!empty($thread)) {
+			$tl = twitter_standard_timeline($thread, 'friends');
+			$content .= theme('timeline', $tl);
+
+			if ($reply_id) {
+				$content .= "<p><a href=\"".BASE_URL."status/$reply_id\">".__("Show previous conversations")." &raquo;</a></p>";
+			}
 		}
 
 		theme('page', __("Status")." $id", $content);
 	}
-}
-
-function twitter_thread_timeline($thread_id) {
-	$request = API_URLS."search/thread/{$thread_id}";
-	$tl = twitter_standard_timeline(twitter_fetch($request), 'thread');
-	return $tl;
 }
 
 function twitter_retweet_page($query) {
@@ -615,6 +642,7 @@ function twitter_replies_page() {
 
 	$tl = twitter_process($request);
 	$tl = twitter_standard_timeline($tl, 'replies');
+
 	$content = theme('status_form');
 	$content .= theme('timeline', $tl);
 	theme('page', __("Replies"), $content);
@@ -1124,7 +1152,7 @@ function twitter_timeline_filter($input) {
 function theme_timeline($feed) {
 	if (count($feed) == 0) return theme('no_tweets');
 
-	$hide_pagination = count($feed) < 2 ? true : false;
+	$hide_pagination = count($feed) < 5 ? true : false;
 	$rows = array();
 	$page = menu_current_page();
 	$date_heading = false;

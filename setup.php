@@ -1,11 +1,16 @@
 <?php
 error_reporting(E_ALL ^ E_WARNING);
-$base_url = 'http://'.$_SERVER['HTTP_HOST'];
+
+$base_url = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off' ? 'https' : 'http';
+$base_url .= '://'.$_SERVER['HTTP_HOST'];
+
 if ($directory = trim(dirname($_SERVER['SCRIPT_NAME']), '/\,')){
 	$base_url .= '/'.$directory;
 }
+
 define('BASE_URL', $base_url.'/');
 define('ABSPATH', dirname(__FILE__).'/');
+
 $configFile = file(ABSPATH . 'config-sample.php');
 $notice = '';
 
@@ -23,17 +28,6 @@ if (isset($_GET['step'])) {
 	$step = $_GET['step'];
 } else {
 	$step = 0;
-}
-
-function rewritable() {
-	$ch = curl_init();
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-	curl_setopt($ch, CURLOPT_URL, BASE_URL.'settings');
-	curl_exec($ch);
-	$response_info = curl_getinfo($ch);
-
-	if ($response_info["http_code"] == "404") return false;
-	return true;
 }
 
 function display_header($n) {
@@ -77,12 +71,6 @@ switch($step) {
 			$t_ivt	= trim($_POST['t_ivt']);
 			$t_psw	= (empty($t_psw)) ? trim($_POST['t_psw']) : 'twitter';
 
-			if (rewritable()) {
-				$t_url = BASE_URL;
-			} else {
-				$t_url = BASE_URL.'index.php?q=';
-			}
-
 			if ($notice == '') {
 				$handle = fopen(ABSPATH . 'config.php', 'w');
 				foreach ($configFile as $line_num => $line) {
@@ -98,12 +86,6 @@ switch($step) {
 							break;
 						case "EDLY_":
 							fwrite($handle, str_replace('putyourinfohere', $t_eak, $line));
-							break;
-						case "E_URL":
-							fwrite($handle, str_replace('putyourinfohere', $t_url, $line));
-							break;
-						case "E_URF":
-							fwrite($handle, str_replace('putyourinfohere', BASE_URL, $line));
 							break;
 						case "_TITL":
 							fwrite($handle, str_replace('putyourinfohere', $t_title, $line));

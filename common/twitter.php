@@ -392,7 +392,7 @@ function twitter_parse_tags($input, $entities = false) {
                 $text = $hashtag->text;
 
                 $pattern = '/(^|\s)([#＃]+)('. $text .')/iu';
-                $link_html = ' <a href="hash/' . $text . '">#' . $text . '</a> ';
+                $link_html = ' <a class="hashtag" href="hash/' . $text . '">#' . $text . '</a> ';
 
                 $out = preg_replace($pattern,  $link_html, $out, 1);
             }

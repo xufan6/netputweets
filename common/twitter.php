@@ -149,7 +149,7 @@ menu_register(array(
 ));
 
 function friendship_exists($user_a) {
-	$request = API_URL."friendships/show.json?target_screen_name=$user_a";
+    $request = API_URL.'friendships/show.json?include_entities=true&target_screen_name=' . $user_a;
 	$following = twitter_process($request);
 
 	if ($following->relationship->target->following == 1) {
@@ -160,7 +160,7 @@ function friendship_exists($user_a) {
 }
 
 function friendship($user_a) {
-	$request = API_URL.'friendships/show.json?target_screen_name=' . $user_a;
+    $request = API_URL.'friendships/show.json?include_entities=true&target_screen_name=' . $user_a;
 	return twitter_process($request);
 }
 
@@ -513,7 +513,7 @@ function twitter_delete_page($query) {
 	twitter_ensure_post_action();
 	$id = (string) $query[1];
 	if (is_numeric($id)) {
-		$request = API_URL."statuses/destroy/{$id}.json?page=".intval($_GET['page']);
+        $request = API_URL."statuses/destroy/{$id}.json?include_entities=true&page=".intval($_GET['page']);
 		$tl = twitter_process($request, true);
 		twitter_refresh('user/'.user_current_username());
 	}
@@ -550,9 +550,9 @@ function twitter_block_page($query) {
 	$user = $query[1];
 	if ($user) {
 		if($query[0] == 'block'){
-			$request = API_URL."blocks/create/create.json?screen_name={$user}";
+            $request = API_URL."blocks/create/create.json?include_entities=true&screen_name={$user}";
 		} else {
-			$request = API_URL."blocks/destroy/destroy.json?screen_name={$user}";
+            $request = API_URL."blocks/destroy/destroy.json?include_entities=true&screen_name={$user}";
 		}
 		twitter_process($request, true);
 		twitter_refresh("user/{$user}");

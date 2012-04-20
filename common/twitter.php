@@ -303,6 +303,9 @@ function twitter_process($url, $post_data = false) {
 		curl_setopt ($ch, CURLOPT_POST, true);
 		curl_setopt ($ch, CURLOPT_POSTFIELDS, $post_data);
 	}
+    if($post_data == false) {
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-PHX: true'));
+    }
 	if (user_type() != 'oauth' && user_is_authenticated()) curl_setopt($ch, CURLOPT_USERPWD, user_current_username().':'.$GLOBALS['user']['password']);
 	curl_setopt($ch, CURLOPT_USERAGENT, 'dabr');
 	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); //15
@@ -353,6 +356,7 @@ function twitter_fetch($url) {
 	curl_setopt($ch, CURLOPT_URL, $url);
 	curl_setopt($ch, CURLOPT_TIMEOUT, 30);
 	curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-PHX: true'));
 	$response = curl_exec($ch);
 	curl_close($ch);
 	return $response;
